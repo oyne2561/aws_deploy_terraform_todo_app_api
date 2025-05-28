@@ -37,7 +37,7 @@ variable "db_instance_class" {
 variable "db_name" {
   description = "Database name"
   type        = string
-  default     = "todo_app_production"
+  default     = "todo_app_prod"
 }
 
 variable "db_username" {
