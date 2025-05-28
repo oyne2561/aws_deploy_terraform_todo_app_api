@@ -57,3 +57,9 @@ terraform apply tfplan
 ```
 tf destory
 ```
+
+## その他コマンド
+format整形
+```
+tf fmt
+```

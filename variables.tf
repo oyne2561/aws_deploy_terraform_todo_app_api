@@ -51,24 +51,24 @@ variable "db_password" {
   description = "Database password"
   type        = string
   # TODO こちらを書き換えてリソースを作成する。
-  default     = "postgres"
-  sensitive   = true
+  default   = "postgres"
+  sensitive = true
 }
 
 variable "rails_master_key" {
   description = "Rails master key"
   type        = string
   # TODO Railsで調べ、書き換えて、リソースを作成する
-  default     = "rails_master_key"
-  sensitive   = true
+  default   = "rails_master_key"
+  sensitive = true
 }
 
 variable "secret_key_base" {
   description = "Rails secret key base"
   type        = string
   # TODO Railsで調べ、書き換えて、リソースを作成する
-  default     = "secret_key_base"
-  sensitive   = true
+  default   = "secret_key_base"
+  sensitive = true
 }
 
 variable "cors_origins" {
