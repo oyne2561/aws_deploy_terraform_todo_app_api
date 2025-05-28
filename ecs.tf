@@ -121,6 +121,12 @@ resource "aws_ecs_task_definition" "main" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
+  # ARM64アーキテクチャを指定
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "ARM64"
+  }
+
   container_definitions = jsonencode([
     {
       name  = "${var.app_name}-api"
@@ -135,8 +141,12 @@ resource "aws_ecs_task_definition" "main" {
 
       secrets = [
         {
-          name      = "DATABASE_URL"
-          valueFrom = aws_ssm_parameter.database_url.arn
+          name      = "DB_USERNAME"
+          valueFrom = aws_ssm_parameter.db_username.arn
+        },
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = aws_ssm_parameter.db_password.arn
         },
         {
           name      = "RAILS_MASTER_KEY"
@@ -156,6 +166,18 @@ resource "aws_ecs_task_definition" "main" {
         {
           name  = "CORS_ORIGINS"
           value = var.cors_origins
+        },
+        {
+          name  = "DB_HOST"
+          value = aws_db_instance.main.endpoint
+        },
+        {
+          name  = "DB_PORT"
+          value = tostring(aws_db_instance.main.port)
+        },
+        {
+          name  = "DB_NAME"
+          value = var.db_name
         }
       ]
 
@@ -177,7 +199,7 @@ resource "aws_ecs_task_definition" "main" {
   }
 }
 
-# TODO ECRにDocker imageをpushしないとタスクが落ち続けるので、初回起動時はコメントアウトする。
+# TODO ECRにDocker imageをpushしないとタスクが落ち続けるので、2回目のApply時にコメントを解除する。
 # ECS サービス
 resource "aws_ecs_service" "main" {
   name            = "${var.app_name}-service"

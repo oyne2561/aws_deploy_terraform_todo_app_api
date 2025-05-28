@@ -1,10 +1,52 @@
-# terraform/parameter_store.tf
-
 # データベース接続情報
-resource "aws_ssm_parameter" "database_url" {
-  name  = "/${var.app_name}/DATABASE_URL"
+resource "aws_ssm_parameter" "db_host" {
+  name  = "/${var.app_name}/DB_HOST"
+  type  = "String"
+  value = aws_db_instance.main.endpoint
+
+  tags = {
+    Environment = var.environment
+    Application = var.app_name
+  }
+}
+
+resource "aws_ssm_parameter" "db_port" {
+  name  = "/${var.app_name}/DB_PORT"
+  type  = "String"
+  value = tostring(aws_db_instance.main.port)
+
+  tags = {
+    Environment = var.environment
+    Application = var.app_name
+  }
+}
+
+resource "aws_ssm_parameter" "db_name" {
+  name  = "/${var.app_name}/DB_NAME"
+  type  = "String"
+  value = var.db_name
+
+  tags = {
+    Environment = var.environment
+    Application = var.app_name
+  }
+}
+
+resource "aws_ssm_parameter" "db_username" {
+  name  = "/${var.app_name}/DB_USERNAME"
   type  = "SecureString"
-  value = "postgresql://${var.db_username}:${var.db_password}@${aws_db_instance.main.endpoint}/${var.db_name}"
+  value = var.db_username
+
+  tags = {
+    Environment = var.environment
+    Application = var.app_name
+  }
+}
+
+resource "aws_ssm_parameter" "db_password" {
+  name  = "/${var.app_name}/DB_PASSWORD"
+  type  = "SecureString"
+  value = var.db_password
 
   tags = {
     Environment = var.environment
