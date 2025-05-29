@@ -6,20 +6,10 @@ terraform {
       version = "~> 5.0"
     }
   }
-
-  # backend "s3" {
-  #   bucket = "todo-app-terraform-state-bucket"
-  #   key    = "oolab-api/terraform.tfstate"
-  #   region = "ap-northeast-1"
-  # }
 }
 
 provider "aws" {
   region = var.aws_region
-  # 何も指定しなくてもdefaultプロファイルが使われる。
-
-  # 例: 特定のプロファイルを使用する場合
-  # profile = "production"
 }
 
 # データソース

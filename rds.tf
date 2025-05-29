@@ -1,5 +1,3 @@
-# terraform/rds.tf
-
 # RDSサブネットグループ
 resource "aws_db_subnet_group" "main" {
   name = "${var.app_name}-db-subnet-group"
