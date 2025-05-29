@@ -1,3 +1,12 @@
+# ホストゾーン作成
+resource "aws_route53_zone" "main" {
+  name = var.domain_name
+
+  tags = {
+    Name = "${var.app_name}-hosted-zone"
+  }
+}
+
 # SSL証明書
 resource "aws_acm_certificate" "main" {
   domain_name       = var.subdomain
@@ -31,7 +40,7 @@ resource "aws_route53_record" "cert_validation" {
   records         = [each.value.record]
   ttl             = 60
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.main.zone_id
+  zone_id         = aws_route53_zone.main.zone_id
 }
 
 # SSL証明書検証
@@ -113,7 +122,7 @@ resource "aws_lb_listener" "https" {
 
 # Route53レコード
 resource "aws_route53_record" "main" {
-  zone_id = data.aws_route53_zone.main.zone_id
+  zone_id = aws_route53_zone.main.zone_id
   name    = var.subdomain
   type    = "A"
 

@@ -27,10 +27,6 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_route53_zone" "main" {
-  name = var.domain_name
-}
-
 locals {
   availability_zones = ["ap-northeast-1a", "ap-northeast-1c"]
 }
