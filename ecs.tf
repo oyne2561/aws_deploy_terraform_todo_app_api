@@ -28,7 +28,7 @@ resource "aws_cloudwatch_log_group" "ecs" {
 
 # ECR リポジトリ
 resource "aws_ecr_repository" "app" {
-  name                 = "${var.app_name}"
+  name                 = var.app_name
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -199,33 +199,35 @@ resource "aws_ecs_task_definition" "main" {
   }
 }
 
-# TODO ECRにDocker imageをpushしないとタスクが落ち続けるので、2回目のApply時にコメントを解除する。
-# ECS サービス
-resource "aws_ecs_service" "main" {
-  name            = "${var.app_name}-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.main.arn
-  desired_count   = 2
-  launch_type     = "FARGATE"
+# # TODO ECRにDocker imageをpushしないとタスクが落ち続けるので、2回目のApply時にコメントを解除する。
+# # ECS サービス
+# resource "aws_ecs_service" "main" {
+#   name            = "${var.app_name}-service"
+#   cluster         = aws_ecs_cluster.main.id
+#   task_definition = aws_ecs_task_definition.main.arn
+#   desired_count   = 2
+#   launch_type     = "FARGATE"
 
-  network_configuration {
-    security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = aws_subnet.public[*].id
-    assign_public_ip = true
-  }
+#   network_configuration {
+#     security_groups  = [aws_security_group.ecs_tasks.id]
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.main.arn
-    container_name   = "${var.app_name}-api"
-    container_port   = 3000
-  }
+#     # 「aws_subnet.public[*].id」 - aws_subnet.publicのすべてのインスタンスのid属性を取得する
+#     subnets          = aws_subnet.public[*].id
+#     assign_public_ip = true
+#   }
 
-  depends_on = [
-    aws_lb_listener.https,
-    aws_iam_role_policy_attachment.ecs_task_execution_role_policy
-  ]
+#   load_balancer {
+#     target_group_arn = aws_lb_target_group.main.arn
+#     container_name   = "${var.app_name}-api"
+#     container_port   = 3000
+#   }
 
-  tags = {
-    Name = "${var.app_name}-service"
-  }
-}
+#   depends_on = [
+#     aws_lb_listener.https,
+#     aws_iam_role_policy_attachment.ecs_task_execution_role_policy
+#   ]
+
+#   tags = {
+#     Name = "${var.app_name}-service"
+#   }
+# }

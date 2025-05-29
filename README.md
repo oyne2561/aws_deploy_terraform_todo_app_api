@@ -51,11 +51,71 @@ terraform show tfplan
 terraform apply tfplan
 ```
 
+以下のようなログになったら Control + C でキャンセルする。ACMのステータスが保留中から切り替わるのを待つ。(時間がかかる)
+```
+aws_acm_certificate_validation.main: Still creating... [7m10s elapsed]
+aws_acm_certificate_validation.main: Still creating... [7m20s elapsed]
+aws_acm_certificate_validation.main: Still creating... [7m30s elapsed]
+aws_acm_certificate_validation.main: Still creating... [7m40s elapsed]
+```
+
+
+ECRにDockerImageをPushする。
+```
+aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 0649363938393316.dkr.ecr.ap-northeast-1.amazonaws.com
+
+docker build -f Dockerfile.prod -t todo-app-api .
+
+docker tag todo-app-api-api:latest 0649363938393316.dkr.ecr.ap-northeast-1.amazonaws.com/todo-app-api-api:latest
+docker push 0649363938393316.dkr.ecr.ap-northeast-1.amazonaws.com/todo-app-api:latest
+```
+
+ecs.tfの以下の行のコメントを外す。
+```
+# # TODO ECRにDocker imageをpushしないとタスクが落ち続けるので、2回目のApply時にコメントを解除する。
+# # ECS サービス
+# resource "aws_ecs_service" "main" {
+#   name            = "${var.app_name}-service"
+#   cluster         = aws_ecs_cluster.main.id
+#   task_definition = aws_ecs_task_definition.main.arn
+#   desired_count   = 2
+#   launch_type     = "FARGATE"
+
+#   network_configuration {
+#     security_groups  = [aws_security_group.ecs_tasks.id]
+#     subnets          = aws_subnet.public[*].id
+#     assign_public_ip = true
+#   }
+
+#   load_balancer {
+#     target_group_arn = aws_lb_target_group.main.arn
+#     container_name   = "${var.app_name}-api"
+#     container_port   = 3000
+#   }
+
+#   depends_on = [
+#     aws_lb_listener.https,
+#     aws_iam_role_policy_attachment.ecs_task_execution_role_policy
+#   ]
+
+#   tags = {
+#     Name = "${var.app_name}-service"
+#   }
+# }
+```
+
+再度、Applyする
+```
+terraform plan -out=tfplan
+
+terraform apply tfplan
+```
+
 
 ## リソースの削除手順
 
 ```
-tf destory
+tf destroy
 ```
 
 ## その他コマンド

@@ -2,7 +2,8 @@
 
 # RDSサブネットグループ
 resource "aws_db_subnet_group" "main" {
-  name       = "${var.app_name}-db-subnet-group"
+  name = "${var.app_name}-db-subnet-group"
+  # 「aws_subnet.private[*].id」 - aws_subnet.privateのすべてのインスタンスのid属性を取得する
   subnet_ids = aws_subnet.private[*].id
 
   tags = {
@@ -52,10 +53,10 @@ resource "aws_db_instance" "main" {
   parameter_group_name   = aws_db_parameter_group.main.name
 
   backup_retention_period = 7
-  backup_window          = "03:00-04:00"
-  maintenance_window     = "sun:04:00-sun:05:00"
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "sun:04:00-sun:05:00"
 
-  skip_final_snapshot = false
+  skip_final_snapshot       = false
   final_snapshot_identifier = "${var.app_name}-final-snapshot-${formatdate("YYYY-MM-DD-hhmm", timestamp())}"
 
   # 削除保護を無効にする
