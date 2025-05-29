@@ -19,12 +19,14 @@ variable "environment" {
 variable "domain_name" {
   description = "Domain name"
   type        = string
+  # TODO こちらを取得したドメインに書き換える。
   default     = "oolab.tech"
 }
 
 variable "subdomain" {
   description = "Subdomain for the API"
   type        = string
+  # TODO こちらを取得したドメインに書き換える。
   default     = "prod-api.oolab.tech"
 }
 
@@ -37,13 +39,15 @@ variable "db_instance_class" {
 variable "db_name" {
   description = "Database name"
   type        = string
-  default     = "todo_app_prod"
+  # TODO こちらを書き換えてリソースを作成する。
+  default     = "todo_app_prod_db"
 }
 
 variable "db_username" {
   description = "Database username"
   type        = string
-  default     = "postgres"
+  # TODO こちらを書き換えてリソースを作成する。
+  default     = "todo_app_admin"
   sensitive   = true
 }
 
@@ -51,7 +55,7 @@ variable "db_password" {
   description = "Database password"
   type        = string
   # TODO こちらを書き換えてリソースを作成する。
-  default   = "postgres"
+  default   = "password01"
   sensitive = true
 }
 
@@ -74,5 +78,6 @@ variable "secret_key_base" {
 variable "cors_origins" {
   description = "CORS origins"
   type        = string
+  # TODO 取得したドメインに置き換える。
   default     = "https://oolab.tech,https://www.oolab.tech"
 }

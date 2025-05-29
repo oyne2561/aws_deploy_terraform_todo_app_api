@@ -2,8 +2,7 @@
 resource "aws_ssm_parameter" "db_host" {
   name  = "/${var.app_name}/DB_HOST"
   type  = "String"
-  value = aws_db_instance.main.endpoint
-
+  value = split(":", aws_db_instance.main.endpoint)[0]
   tags = {
     Environment = var.environment
     Application = var.app_name

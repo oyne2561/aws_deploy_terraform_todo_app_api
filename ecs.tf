@@ -121,15 +121,16 @@ resource "aws_ecs_task_definition" "main" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
-  # ARM64アーキテクチャを指定
+  # ✅ x86_64アーキテクチャを指定
   runtime_platform {
     operating_system_family = "LINUX"
-    cpu_architecture        = "ARM64"
+    cpu_architecture        = "X86_64"
   }
+
 
   container_definitions = jsonencode([
     {
-      name  = "${var.app_name}-api"
+      name  = "${var.app_name}"
       image = "${aws_ecr_repository.app.repository_url}:latest"
 
       portMappings = [
@@ -140,6 +141,18 @@ resource "aws_ecs_task_definition" "main" {
       ]
 
       secrets = [
+        {
+          name      = "DB_HOST"
+          valueFrom = aws_ssm_parameter.db_host.arn
+        },
+        {
+          name      = "DB_PORT"
+          valueFrom = aws_ssm_parameter.db_port.arn
+        },
+        {
+          name      = "DB_NAME"
+          valueFrom = aws_ssm_parameter.db_name.arn
+        },
         {
           name      = "DB_USERNAME"
           valueFrom = aws_ssm_parameter.db_username.arn
@@ -166,18 +179,6 @@ resource "aws_ecs_task_definition" "main" {
         {
           name  = "CORS_ORIGINS"
           value = var.cors_origins
-        },
-        {
-          name  = "DB_HOST"
-          value = aws_db_instance.main.endpoint
-        },
-        {
-          name  = "DB_PORT"
-          value = tostring(aws_db_instance.main.port)
-        },
-        {
-          name  = "DB_NAME"
-          value = var.db_name
         }
       ]
 
@@ -209,11 +210,12 @@ resource "aws_ecs_task_definition" "main" {
 #   launch_type     = "FARGATE"
 
 #   network_configuration {
-#     security_groups  = [aws_security_group.ecs_tasks.id]
+#     security_groups = [aws_security_group.ecs_tasks.id]
 
 #     # 「aws_subnet.public[*].id」 - aws_subnet.publicのすべてのインスタンスのid属性を取得する
-#     subnets          = aws_subnet.public[*].id
-#     assign_public_ip = true
+#     subnets = aws_subnet.public[*].id
+#     # パブリックIP不要（NAT Gateway経由でインターネットアクセス）
+#     assign_public_ip = false
 #   }
 
 #   load_balancer {
@@ -224,7 +226,7 @@ resource "aws_ecs_task_definition" "main" {
 
 #   depends_on = [
 #     aws_lb_listener.https,
-#     aws_iam_role_policy_attachment.ecs_task_execution_role_policy
+#     aws_iam_role_policy_attachment.ecs_task_execution_role_policy,
 #   ]
 
 #   tags = {

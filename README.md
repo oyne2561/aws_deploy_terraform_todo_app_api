@@ -58,7 +58,15 @@ aws_acm_certificate_validation.main: Still creating... [7m20s elapsed]
 aws_acm_certificate_validation.main: Still creating... [7m30s elapsed]
 aws_acm_certificate_validation.main: Still creating... [7m40s elapsed]
 ```
+ここでムームードメインのコンソールに行き、Route53のホストゾーンのNSレコードの4つをネームサーバに登録する。これをしないとおそらく証明書が有効にならない。
 
+
+再度、Applyする
+```
+terraform plan -out=tfplan
+
+terraform apply tfplan
+```
 
 ECRにDockerImageをPushする。
 ```
@@ -103,6 +111,8 @@ ecs.tfの以下の行のコメントを外す。
 #   }
 # }
 ```
+
+パラメータストアに行き、`RAILS_MASTER_KEY`と`SECRET_KEY_BASE`を正しい値に置き換える
 
 再度、Applyする
 ```
